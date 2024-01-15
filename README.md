@@ -1,126 +1,193 @@
 <img src="https://webassets.telerikacademy.com/images/default-source/logos/telerik-academy.svg" alt="logo" width="300px" style="margin-top: 20px;"/>
 
-# Defining Classes Practice
+# BoardR - Task Organizing System
 
-It's time to practice the building blocks of a class:
+_Part 1_
 
-- attributes - to store data
-- initializers - to create classes more easily and to make sure our classes have correct data
-- methods - to do something with the stored data
+## 1. Description
 
-## 1. Attributes
-Create a file `forum_post.py`
-Create an empty class ForumPost
-```py
-class ForumPost():
-    pass
-```
-Import the class in the `main.py` file. Create two instances of the class and assign properties to them:
-```py
-post1 = ForumPost()
-post1.author = "Steven"
-post1.text = "How to find use for every Microsoft product."
-post1.upvotes = 2
+**BoardR** is a task-management system which will evolve in the next several weeks. During the course of the project, we will follow the best practices of `Object-Oriented Programming` and `Design`.
 
-post2 = ForumPost()
-post2.author = "Todor"
-post2.text = "Alfa Romeo for sale. Preowned by Italian grandma"
-post2.upvotes = 300
+## 2. Goals  
 
-print(f'{post1.text} / by {post1.author}, {post1.upvotes} votes.')
-print(f'{post2.text} / by {post2.author}, {post2.upvotes} votes.')
-```
+Your goal is to design and implement the main building blocks of the application - the **BoardItem**, **Board** and **ItemStatus** classes.
 
-If everything is allright, you should see the following output:
-```none
-How to find use for every Microsoft product. / by Steven, 2 votes.
-Alfa Romeo for sale. Preowned by Italian grandma / by Todor, 300 votes.
-```
-## 2. Initializer
+## 3. Setup
 
-Freely assigning attributes to instances is valid python, but is dangerous, prone to errors, and does not scale beyond one file. Create an initializer that has the **responsibility to assign the required attributes**.
-- don't forget the `self` param!
-  
-- `author` (str)
-- `text` (str)
-- `upvotes` (int)
+- Create a new folder
+- Create a `main.py` file
+- Create `board_item.py`, `board.py` and `item_status.py`files
+- Define the classes in their respective files. 
 
-### Test your code
-
-If everything is done correctly, pasting the following code inside your `main` file should **run without errors** and: **produce correct output**.
-
-#### Code
+## 4. ItemStatus class
+### Description
+This class will be a collection of constants in a particular order - `'Open', 'Todo', 'In progress', 'Done', 'Verified'`. It will have no instance methods or instance attributes. The purpose of this class is to define the only possible Item Statuses.
 
 ```py
-post1 = ForumPost("Steven", "How to find use for every Microsoft product.", 2)
-post2 = ForumPost("Todor", "Alfa Romeo for sale. Preowned by Italian grandma", 300)
-
-print(f'{post1.text} / by {post1.author}, {post1.upvotes} votes.')
-print(f'{post2.text} / by {post2.author}, {post2.upvotes} votes.')
+class ItemStatus:
+    OPEN = 'Open'
+    TODO = 'Todo'
+    IN_PROGRESS = 'In progress'
+    DONE = 'Done'
+    VERIFIED = 'Verified'
 ```
 
-#### Expected output
+Note that these are class attributes and are used through the class name: `ItemStatus.IN_PROGRESS`  
+To be able to follow the predefined order of statuses, define two class methods `next` and `previous`
 
-```none
-How to find use for every Microsoft product. / by Steven, 2 votes.
-Alfa Romeo for sale. Preowned by Italian grandma / by Todor, 300 votes.
+```py
+@classmethod
+def next(cls, current):
+    # logic to return the next valid ItemStatus, based on current   
 ```
 
-## 3. Methods
+If you implement the `next` and `previous` methods correctly, the behavior should be the following
+```py
+next = ItemStatus.next(ItemStatus.IN_PROGRESS)     # Done
+next = ItemStatus.next(ItemStatus.VERIFIED)        # Verified (returns the last if there is no next)
+prev = ItemStatus.previous(ItemStatus.IN_PROGRESS) # Todo
+prev = ItemStatus.previous(ItemStatus.OPEN)        # Open (returns the first if there is no previous)
+```
 
-Add a method `view()` to `ForumPost`. We can do the formatting there and not rely on _outside_ code to correctly format a post.
-- don't forget the `self` param!
+## 5. BoardItem class
 
-### Test your code
+### Description
 
-#### Code
+This class will model our idea of an **Item** that we can put in a **Board** (check [Trello](https://trello.com/)). A BoardItem can be used to describe anything - a **task**, **bug**, **note**, **assignment**...
+
+A minimum viable BoardItem should have at least a `title` (describes what this item is about), `due_date` (when it should be done), and `status` (describes the state of this item - being worked on, being completed, etc..)  
+
+For a useful BoardItem, the `title` should not be empty. The `due_date` should probably be in the future - we can't expect a task to be finished before we created it. There must be some rules on how a BoardItem changes its state - for example, from a state you can only _advance_ to the next one or _rollback_ to the previous one.  
+
+When creating a BoardItem, we must be forced to provide title and date, and we must start from the initial state (a Initializer with the right arguments will come in handy).
+
+### Note about Dates:
+- a date object represents a specific calendar date. More info here: https://docs.python.org/3/library/datetime.html#date-objects
+- to simplify the creation of dates in the future, we can use the following code:
+```py
+from datetime import date, timedelta
+
+def add_days_to_now(d):
+    return date.today() + timedelta(days = d)
+```
+
+### Initializer
+
+- Should accept a `title`, a `date` and assign those to their respective Attributes
+- A new `BoardItem` must have its `status` as `Open`
+- Example:
+
+#### Example
 
 ```python
-post1 = ForumPost("Steven", "How to find use for every Microsoft product.", 2)
-post2 = ForumPost("Todor", "Alfa Romeo for sale. Preowned by Italian grandma", 300)
-
-
-print(post1.view())
-print(post2.view())
+item = BoardItem('Registration doesn\'t work', add_days_to_now(2))
+print(item.title)
+print(item.due_date)
+print(item.status)
 ```
 
-#### Expected output
+#### Output
 
 ```none
-How to find use for every Microsoft product. / by Steven, 2 votes.
-Alfa Romeo for sale. Preowned by Italian grandma / by Todor, 300 votes.
+Registration doesn't work
+2022-03-18 (this will vary depending on when you run the code)
+Open
 ```
 
-## 4. Replies
+### Attributes
 
-Refactor your class to support a collection of replies: 
-You should create the collection as an empty list in the initializer. There is no need to accept the collection as an argument to the initializer method.
+- **title**: _str_, should never be empty, and its length should be between [5, 30] ([How to read bracket notation for ranges?](https://stackoverflow.com/questions/4396290/what-does-this-square-bracket-and-parenthesis-bracket-notation-mean-first1-last))
+- **due_date**: _date_, should never be in the past
+- **status**: _ItemStatus_, `Open -> Todo -> InProgress -> Done -> Verified` 
 
+> Hint: you can **validate** in the Initializer
 
-Methods:
-- don't forget the `self` param!
-- create an `add_reply()` method that adds a new reply to the replies collection
-- refactor the `view()` method to display the replies if present.
+### Methods
+You can rely on the logic defined in the `ItemStatus` class for the following two methods:
+- **revert_status()** - returns the `status` to a previous state - e.g. from **Todo** to **Open**, from **Done** to **InProgress**, etc (no effect if the status is **Open**). 
+- **advance_status()** - advances the `status` to a next state - e.g. from **Open** to **Todo**, from **Done** to **Verified**, etc (no effect if the status is **Verified**)
 
-### Test your code
-
-#### Code
+#### Example
 
 ```python
-post1 = ForumPost("Steven", "How to find use for every Microsoft product.", 2)
-post2 = ForumPost("Todor", "Alfa Romeo for sale. Preowned by Italian grandma", 300)
-post1.add_reply("I like Google!")
-post1.add_reply("Ugh, Microsoft... :(")
-
-print(post1.view())
-print(post2.view())
+item = BoardItem('Registration doesn\'t work', add_days_to_now(2))
+print(item.status) # Open
+item.advance_status()
+print(item.status) # Todo
+item.advance_status()
+print(item.status) # In progress
+item.revert_status()
+print(item.status) # Todo
 ```
 
-#### Expected output
+#### Output
 
 ```none
-How to find use for every Microsoft product. / by Steven, 2 votes.
-- I like Google!
-- Ugh, Microsoft... :(
-Alfa Romeo for sale. Preowned by Italian grandma / by Todor, 300 votes.
+Open
+Todo
+InProgress
+Todo
+```
+
+- **info()** - returns information about the current BoardItem in format `title, [status | dueDate]`
+
+#### Example
+
+```python
+item = BoardItem('Registration doesn\'t work', add_days_to_now(2))
+print(item.info())
+```
+
+#### Output
+
+```none
+Registration doesn't work, [Open | 2022-03-18]
+```
+
+## 5. Board class
+
+### Description
+
+The **Board** class will be used to organize all the BoardItems that we create. In the future, we might want to use it for searching, grouping, viewing, storing...
+
+For now, the **Board** will be no more than a collection of BoardItems. In the next couple of days, we will enhance it.  
+
+### Initializer
+
+Create empty list of BoardItems.
+
+### Attributes
+
+List of BoardItems - we must be able to add items to the board.
+
+### Methods
+
+We will add some in the next chapter.
+
+#### Example
+
+```python
+item = BoardItem('Registration doesn\'t work', add_days_to_now(2))
+anotherItem = BoardItem('Encrypt user data', add_days_to_now(10))
+
+item.advance_status()
+
+board = Board()
+
+board.items.append(item)
+board.items.append(anotherItem)
+
+for board_item in board.items:
+    board_item.advance_status()
+
+for board_item in board.items:
+    print(board_item.info())
+
+```
+
+#### Output
+
+```none
+Registration doesn't work, [In progress | 2022-03-18]
+Encrypt user data, [Todo | 2022-03-26]
 ```
