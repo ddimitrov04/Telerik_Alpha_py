@@ -1,0 +1,7 @@
+http://127.0.0.1:8000/profiles?country_code=BG
+http://127.0.0.1:8000/profiles
+http://127.0.0.1:8000/profiles/country_codes
+http://127.0.0.1:8000/profiles/1
+http://127.0.0.1:8000/profiles/1/1
+
+
